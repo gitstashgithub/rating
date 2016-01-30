@@ -11,8 +11,8 @@ class LessonRate extends Seeder
         factory(Lesson::class, 2)
             ->create()
             ->each(function (Lesson $lesson) {
-                for ($i = 0; $i < 30; $i++) {
-                    factory(Rate::class, 30)->create(['session_id' => $i,'lesson_id'=>$lesson->id]);
+                for ($i = 0; $i < 5; $i++) {
+                    factory(Rate::class, 5)->create(['session_id' => $i,'lesson_id'=>$lesson->id]);
                 }
             });
     }
