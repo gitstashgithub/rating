@@ -11,7 +11,7 @@ $(document).ready(function () {
     $('#submit-rate').click(function () {
         $.ajax({
                 method: "POST",
-                url: "http://rating.app/rate",
+                url: "/rate",
                 data: {lesson_id: $('#lesson_id').val(), rate: $('#rate').val()},
                 headers: {
                     'X-CSRF-Token': $('input[name="_token"]').val()
@@ -32,7 +32,7 @@ $(document).ready(function () {
     var ajax_call = function () {
         $.ajax({
                 method: "GET",
-                url: "http://rating.app/rate/1",
+                url: "/rate/1",
             })
             .done(function (data) {
                 chart.load({
@@ -47,7 +47,7 @@ $(document).ready(function () {
 
     $.ajax({
             method: "GET",
-            url: "http://rating.app/rate/1",
+            url: "/rate/1",
         })
         .done(function (data) {
             chart.load({
