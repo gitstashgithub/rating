@@ -33,7 +33,7 @@ Route::group(['middleware' => ['web']], function () {
     Route::get('lesson/{id}', [
         'uses' => 'LessonController@show'
     ]);
-    Route::get('rate', [
+    Route::get('rate/{id}', [
         'uses' => 'RateController@getResult'
     ]);
     Route::post('rate', [

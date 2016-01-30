@@ -26,8 +26,8 @@
                                 </div>
 
                                 <div class="col-md-2">
-                                    <input type="hidden" name="lesson_id" value="{{$lesson_id}}"/>
-                                    <button type="submit" class="btn btn-primary">
+                                    <input type="hidden" name="lesson_id" id="lesson_id" value="{{$lesson_id}}"/>
+                                    <button type="button" class="btn btn-primary" id="submit-rate">
                                         Rate
                                     </button>
                                 </div>

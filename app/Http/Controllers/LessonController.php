@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Rate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Ramsey\Uuid\Uuid;
 
@@ -14,12 +15,6 @@ class LessonController extends Controller
             ->view('lesson.show',['lesson_id'=>$id]);
     }
 
-    public function getResult(Request $request)
-    {
-        //dd(Session::getId());
-
-
-    }
 
     public function setRate(Request $request)
     {
