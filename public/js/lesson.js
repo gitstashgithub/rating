@@ -32,7 +32,7 @@ $(document).ready(function () {
     var ajax_call = function () {
         $.ajax({
                 method: "GET",
-                url: "/rate/1",
+                url: "/rate/" + $("#lesson_id").val()
             })
             .done(function (data) {
                 chart.load({
@@ -43,11 +43,13 @@ $(document).ready(function () {
 
     var interval = 1000 * 60 * 0.1; // every 1 minute
 
-    setInterval(ajax_call, interval);
+    if($('#rate').length){
+        setInterval(ajax_call, interval);
+    }
 
     $.ajax({
             method: "GET",
-            url: "/rate/1",
+            url: "/rate/" + $("#lesson_id").val()
         })
         .done(function (data) {
             chart.load({

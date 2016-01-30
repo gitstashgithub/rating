@@ -11,8 +11,12 @@
 |
 */
 
+/*Route::get('/', [
+    'uses' => 'LessonController@all'
+]);*/
+
 Route::get('/', function () {
-    return view('welcome');
+    return Redirect::route('lesson');
 });
 
 /*
@@ -28,7 +32,8 @@ Route::get('/', function () {
 
 Route::group(['middleware' => ['web']], function () {
     Route::get('lesson', [
-        'uses' => 'LessonController@list'
+        'as' => 'lesson',
+        'uses' => 'LessonController@all'
     ]);
     Route::get('lesson/{id}', [
         'uses' => 'LessonController@show'

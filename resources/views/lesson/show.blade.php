@@ -5,34 +5,35 @@
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
                 <div class="panel panel-default">
-                    <div class="panel-heading">Rate</div>
+                    <div class="panel-heading">Rating</div>
                     <div class="panel-body">
                         <form class="form-horizontal" role="form" method="POST" action="{{ url('/rate') }}">
                             {!! csrf_field() !!}
+                            <input type="hidden" name="lesson_id" id="lesson_id" value="{{$lesson->id}}"/>
+                            @if($lesson->enabled)
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <input type="range" min="0" max="4" name="rate" value="0" id="rate"
+                                               onchange="updateRange(this)">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select id="rate-value" onchange="updateRange(this)">
+                                            <option value="0">0</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                        </select>
+                                    </div>
 
-                            <div class="form-group">
-                                <div class="col-md-6">
-                                    <input type="range" min="0" max="4" name="rate" value="0" id="rate"
-                                           onchange="updateRange(this)">
-                                </div>
-                                <div class="col-md-2">
-                                    <select id="rate-value" onchange="updateRange(this)">
-                                        <option value="0">0</option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                    </select>
-                                </div>
+                                    <div class="col-md-2">
 
-                                <div class="col-md-2">
-                                    <input type="hidden" name="lesson_id" id="lesson_id" value="{{$lesson_id}}"/>
-                                    <button type="button" class="btn btn-primary" id="submit-rate">
-                                        Rate
-                                    </button>
+                                        <button type="button" class="btn btn-primary" id="submit-rate">
+                                            Rate
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-
+                            @endif
                             <div class="form-group">
                                 <div class="col-md-10">
                                     <div id="chart"></div>
