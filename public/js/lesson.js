@@ -1,4 +1,5 @@
 var updateRange = function (rate) {
+<<<<<<< HEAD
     if (rate.id == 'rate') {
         $('#rate-value').val(rate.value);
     }
@@ -65,6 +66,32 @@ $(document).ready(function () {
                 max: 4,
                 min: 0
             }
+=======
+    if(rate.id=='rate'){
+        $('#rate-value').val(rate.value);
+    }
+    if(rate.id=='rate-value'){
+        $('#rate').val(rate.value);
+    }
+}
+$( document ).ready(function() {
+
+    var ajax_call = function() {
+        //your jQuery ajax code
+    };
+
+    var interval = 1000 * 60 * 1; // every 1 minute
+
+    setInterval(ajax_call, interval);
+
+    var chart = c3.generate({
+        bindto: '#chart',
+        data: {
+            columns: [
+                ['Mean Rate', 2.21, 2.47, 2.95, 3.69, 3.45, 4.21],
+                ['Median Rate', 3, 4, 2, 3, 3, 4]
+            ]
+>>>>>>> 66fab914a8312dd5b42b607974cc38613e2fac6b
         }
     });
 });

@@ -10,8 +10,12 @@ use Ramsey\Uuid\Uuid;
 
 class RateController extends Controller
 {
+<<<<<<< HEAD
     public function show()
     {
+=======
+    public function show(){
+>>>>>>> 66fab914a8312dd5b42b607974cc38613e2fac6b
         return response()
             ->view('rate.result');
     }
@@ -21,12 +25,18 @@ class RateController extends Controller
     {
         $session_id = Session::getId();
 
+<<<<<<< HEAD
         if (!$session_id) {
             return response('', 400);
+=======
+        if(!$session_id){
+            return response('',400);
+>>>>>>> 66fab914a8312dd5b42b607974cc38613e2fac6b
         }
 
         $array = [];
 
+<<<<<<< HEAD
         $time = DB
             ::table('rates')
             ->where('lesson_id', '=', $id)
@@ -84,14 +94,30 @@ class RateController extends Controller
 //        foreach($result)
 //        dd($return);
         return json_encode($return);
+=======
+        $results = DB
+            ::table('rates')
+            ->where('lesson_id','=',$id)
+            ->orderBy('created_at')
+            ->each(function($rate){
+            var_dump($rate) ;
+        });
+//        foreach($result)
+        //dd($results);
+>>>>>>> 66fab914a8312dd5b42b607974cc38613e2fac6b
     }
 
     public function setRate(Request $request)
     {
         $session_id = Session::getId();
 
+<<<<<<< HEAD
         if (!$session_id) {
             return response('', 400);
+=======
+        if(!$session_id){
+            return response('',400);
+>>>>>>> 66fab914a8312dd5b42b607974cc38613e2fac6b
         }
         $this->validate($request, [
             'lesson_id' => 'required|integer',
@@ -106,6 +132,10 @@ class RateController extends Controller
 
         $rate->save();
 
+<<<<<<< HEAD
         return response('', 201);
+=======
+        return response('',201);
+>>>>>>> 66fab914a8312dd5b42b607974cc38613e2fac6b
     }
 }
