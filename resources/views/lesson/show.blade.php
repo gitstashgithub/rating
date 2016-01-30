@@ -26,13 +26,8 @@
                                 </div>
 
                                 <div class="col-md-2">
-<<<<<<< HEAD
                                     <input type="hidden" name="lesson_id" id="lesson_id" value="{{$lesson_id}}"/>
                                     <button type="button" class="btn btn-primary" id="submit-rate">
-=======
-                                    <input type="hidden" name="lesson_id" value="{{$lesson_id}}"/>
-                                    <button type="submit" class="btn btn-primary">
->>>>>>> 66fab914a8312dd5b42b607974cc38613e2fac6b
                                         Rate
                                     </button>
                                 </div>
