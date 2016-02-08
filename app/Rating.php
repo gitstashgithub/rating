@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
-class Rate extends Model
+class Rating extends Model
 {
-    protected $table = 'rates';
+    protected $table = 'ratings';
 
     /**
      * The attributes that are mass assignable.
@@ -18,6 +18,6 @@ class Rate extends Model
      * @var array
      */
     protected $fillable = [
-        'lesson_id', 'score',
+        'lesson_id', 'rating',
     ];
 }

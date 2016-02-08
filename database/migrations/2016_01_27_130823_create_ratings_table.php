@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRatesTable extends Migration
+class CreateRatingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,11 +12,11 @@ class CreateRatesTable extends Migration
      */
     public function up()
     {
-        Schema::create('rates', function (Blueprint $table) {
+        Schema::create('ratings', function (Blueprint $table) {
             $table->increments('id');
             $table->string('session_id')->nullable();
             $table->integer('lesson_id')->nullable();
-            $table->tinyInteger('rate')->nullable();
+            $table->tinyInteger('rating')->nullable();
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ class CreateRatesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('rates');
+        Schema::drop('ratings');
     }
 }

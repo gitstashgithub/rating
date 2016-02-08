@@ -20,6 +20,13 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
     ];
 });
 
+$factory->define(App\Lecture::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->text('10'),
+        'description' => $faker->text('30'),
+    ];
+});
+
 $factory->define(App\Lesson::class, function (Faker\Generator $faker) {
     return [
         'lesson_date' => $faker->date(),
@@ -28,11 +35,18 @@ $factory->define(App\Lesson::class, function (Faker\Generator $faker) {
     ];
 });
 
-$factory->define(App\Rate::class, function (Faker\Generator $faker) {
+$factory->define(App\Bookmark::class, function (Faker\Generator $faker) {
+    return [
+        'bookmark' => $faker->text(10),
+        'created_at' => $faker->dateTimeBetween('-1 hour','now')
+    ];
+});
+
+$factory->define(App\Rating::class, function (Faker\Generator $faker) {
     return [
         'session_id' => $faker->numberBetween(0,60),
         'lesson_id' => $faker->numberBetween(0,60),
-        'rate' => $faker->numberBetween(0,4),
+        'rating' => $faker->numberBetween(1,5),
         'created_at' => $faker->dateTimeBetween('-1 hour','now')
     ];
 });

@@ -4,9 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Lesson extends Model
+class Lecture extends Model
 {
-    protected $table = 'lessons';
+    protected $table = 'lectures';
 
     /**
      * The attributes that are mass assignable.
@@ -14,11 +14,11 @@ class Lesson extends Model
      * @var array
      */
     protected $fillable = [
-        'lesson_date', 'lesson_time', 'enabled'
+        'name', 'description'
     ];
 
-    public function lecture()
+    public function lessons()
     {
-        return $this->belongsTo(Lecture::class);
+        return $this->hasMany(Lesson::class);
     }
 }

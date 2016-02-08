@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateLessonsTable extends Migration
+class CreateBookmarksTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,12 +12,10 @@ class CreateLessonsTable extends Migration
      */
     public function up()
     {
-        Schema::create('lessons', function (Blueprint $table) {
+        Schema::create('bookmarks', function (Blueprint $table) {
             $table->increments('id');
-            $table->date('lesson_date')->nullable();
-            $table->time('lesson_time')->nullable();
-            $table->integer('lecture_id')->index();
-            $table->boolean('enabled')->nullable();
+            $table->integer('lesson_id')->index();
+            $table->text('bookmark')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +27,6 @@ class CreateLessonsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('lessons');
+        Schema::drop('bookmarks');
     }
 }
