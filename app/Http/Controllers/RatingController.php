@@ -55,9 +55,8 @@ class RatingController extends Controller
                 $session_id = $result->session_id;
                 $allSessions[] = $session_id;
                 $created_at = strtotime($result->created_at);
-                if ($created_at > $i && $created_at < $i + 60) {
+                if ($created_at >= $i && $created_at < $i + 60) {
                     $ratings[$session_id] = $result->rating;
-                    break;
                 }
             }
 //var_dump($ratings);
