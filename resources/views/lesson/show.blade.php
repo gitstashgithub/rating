@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="panel panel-default">
-                    <div class="panel-heading">{{$lesson->Description}}</div>
+                    <div class="panel-heading">{{$lesson->description}}</div>
                     <div class="panel-body">
                         <form class="form-horizontal" role="form" method="POST" action="{{ url('/rating') }}">
                             {!! csrf_field() !!}
