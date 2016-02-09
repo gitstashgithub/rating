@@ -40,6 +40,7 @@ class LessonController extends Controller
     {
         $lesson = new Lesson();
         $lesson->lecture_id = $request->get('lectureId');
+        $lesson->description = $request->get('description');
         $lesson->lesson_date = $request->get('lesson_date');
         $lesson->lesson_time = $request->get('lesson_time');
         $lesson->enabled = 0;
@@ -53,6 +54,7 @@ class LessonController extends Controller
         if (!$lesson) {
             return response('Leeson not found', 404);
         }
+        $lesson->description = $request->get('description');
         $lesson->lesson_date = $request->get('lesson_date');
         $lesson->lesson_time = $request->get('lesson_time');
         $lesson->save();

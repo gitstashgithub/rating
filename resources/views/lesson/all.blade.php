@@ -16,7 +16,7 @@
                                         <ul class="list-group">
                                             @foreach ($lessons as $lesson)
                                                 <li class="list-group-item">
-                                                    <a href="/lesson/{{ $lesson->id }}">{{ $lesson->lesson_date }} {{ $lesson->lesson_time }}</a>
+                                                    <a href="/lesson/{{ $lesson->id }}">{{ $lesson->lesson_date }} {{ $lesson->lesson_time }} {{ $lesson->description }}</a>
                                                     <span class="enabled-label" id="enabled-label-{{ $lesson->id }}">
                                                         @if($lesson->enabled)
                                                             <span class="label label-success">Enabled</span>

@@ -14,7 +14,7 @@ class Lesson extends Model
      * @var array
      */
     protected $fillable = [
-        'lesson_date', 'lesson_time', 'enabled'
+        'description','lesson_date', 'lesson_time', 'enabled'
     ];
 
     public function lecture()

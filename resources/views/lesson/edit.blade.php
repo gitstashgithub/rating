@@ -8,46 +8,62 @@
                     <div class="panel-heading">{{$lecture->name}}</div>
                     <div class="panel-body">
                         {!! Form::model($lesson, ['action' => $action,'method' => $method]) !!}
-                            {!! csrf_field() !!}
+                        {!! csrf_field() !!}
                         <input type="hidden" name="lectureId" value="{{ $lecture->id }}">
 
-                            <div class="form-group{{ $errors->has('lesson_date') ? ' has-error' : '' }}">
-                                <label class="col-md-4 control-label">Date</label>
+                        <div class="form-group{{ $errors->has('lesson_date') ? ' has-error' : '' }}">
+                            <label class="col-md-4 control-label">Description</label>
 
-                                <div class="col-md-6">
-                                    <input type="date" class="form-control" name="lesson_date" value="{{ $lesson->lesson_date }}">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" name="description"
+                                       value="{{ $lesson->description }}">
 
-                                    @if ($errors->has('lesson_date'))
-                                        <span class="help-block">
+                                @if ($errors->has('description'))
+                                    <span class="help-block">
+                                        <strong>{{ $errors->first('description') }}</strong>
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="form-group{{ $errors->has('lesson_date') ? ' has-error' : '' }}">
+                            <label class="col-md-4 control-label">Date</label>
+
+                            <div class="col-md-6">
+                                <input type="date" class="form-control" name="lesson_date"
+                                       value="{{ $lesson->lesson_date }}">
+
+                                @if ($errors->has('lesson_date'))
+                                    <span class="help-block">
                                         <strong>{{ $errors->first('lesson_date') }}</strong>
                                     </span>
-                                    @endif
-                                </div>
+                                @endif
                             </div>
+                        </div>
 
-                            <div class="form-group{{ $errors->has('lesson_time') ? ' has-error' : '' }}">
-                                <label class="col-md-4 control-label">Time</label>
+                        <div class="form-group{{ $errors->has('lesson_time') ? ' has-error' : '' }}">
+                            <label class="col-md-4 control-label">Time</label>
 
-                                <div class="col-md-6">
-                                    <input type="time" class="form-control" name="lesson_time" value="{{ $lesson->lesson_time }}">
+                            <div class="col-md-6">
+                                <input type="time" class="form-control" name="lesson_time"
+                                       value="{{ $lesson->lesson_time }}">
 
-                                    @if ($errors->has('lesson_time'))
-                                        <span class="help-block">
+                                @if ($errors->has('lesson_time'))
+                                    <span class="help-block">
                                         <strong>{{ $errors->first('lesson_time') }}</strong>
                                     </span>
-                                    @endif
-                                </div>
+                                @endif
                             </div>
+                        </div>
 
 
-
-                            <div class="form-group">
-                                <div class="col-md-6 col-md-offset-4">
-                                    <button type="submit" class="btn btn-primary">
-                                        Save
-                                    </button>
-                                </div>
+                        <div class="form-group">
+                            <div class="col-md-6 col-md-offset-4">
+                                <button type="submit" class="btn btn-primary">
+                                    Save
+                                </button>
                             </div>
+                        </div>
                         {!! Form::close() !!}
                     </div>
                 </div>

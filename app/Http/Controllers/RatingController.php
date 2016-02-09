@@ -48,24 +48,29 @@ class RatingController extends Controller
         //dd($results);
 
         $j = 0;
+        $allSessions = [];
         for ($i = $start; $i <= $finish; $i = $i + 60) {
-            //echo date('Y-m-d h:i:s', $i) . '<br>';
             $ratings = [];
             foreach ($results as $result) {
                 $session_id = $result->session_id;
+                $allSessions[] = $session_id;
                 $created_at = strtotime($result->created_at);
                 if ($created_at > $i && $created_at < $i + 60) {
                     $ratings[$session_id] = $result->rating;
-                } else {
-                    if ($j > 0 && array_key_exists($session_id, $array[$j - 1])) {
-//                        var_dump($session_id, $array[$j-1]);
-                        $ratings[$session_id] = $array[$j - 1][$session_id];
-                    }
+                    break;
                 }
             }
 //var_dump($ratings);
             $array[] = $ratings;
             $j++;
+        }
+
+        foreach($array as $item=>$value){
+            foreach($allSessions as $session_id){
+                if($item>0 && !array_key_exists($session_id, $value) && array_key_exists($session_id,$array[$item-1])){
+                    $array[$item][$session_id] = $array[$item-1][$session_id];
+                }
+            }
         }
         //dd($array);
         $return = [];

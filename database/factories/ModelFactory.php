@@ -29,6 +29,7 @@ $factory->define(App\Lecture::class, function (Faker\Generator $faker) {
 
 $factory->define(App\Lesson::class, function (Faker\Generator $faker) {
     return [
+        'description' => $faker->text('30'),
         'lesson_date' => $faker->date(),
         'lesson_time' => $faker->time(),
         'enabled' => $faker->boolean(),
