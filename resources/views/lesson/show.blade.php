@@ -10,11 +10,12 @@
                         <form class="form-horizontal" role="form" method="POST" action="{{ url('/rating') }}">
                             {!! csrf_field() !!}
                             <input type="hidden" name="lesson_id" id="lesson_id" value="{{$lesson->id}}"/>
-                            @if($lesson->enabled)
+                            @if($lesson->enabled && !Auth::check())
                                 <div class="form-group">
                                     <div class="col-md-8">
                                         {{--<input type="range" min="0" max="4" name="rate" value="0" id="rate"--}}
                                         {{--onchange="updateRange(this)">--}}
+                                        <div>Rate your understanding (1=very poor, 5=very good)</div>
                                         <input id="rate" name="rate" type="number" class="rating" min=0 max=5 step=1>
                                     </div>
                                     {{--<div class="col-md-2">--}}
