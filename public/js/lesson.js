@@ -28,9 +28,9 @@ var colorPattern = [
 ];
 $(document).ready(function () {
     $("#rate").rating();
-    $('.star-rating').append('<div class="caption"><span class="label" id="send-status"></span></div>');
 
     $('#rate').on('rating.change', function (event, value, caption) {
+
         $.ajax({
                 method: "POST",
                 url: "/rating",
@@ -39,17 +39,20 @@ $(document).ready(function () {
                     'X-CSRF-Token': $('input[name="_token"]').val()
                 },
                 beforeSend: function (xhr) {
-                    $('#send-status').removeClass().addClass('label label-info').html('sending...');
                     $('#rate').rating('refresh', {disabled: true});
+                    $('.rating-container .caption').append('<span class="label" id="send-status"></span>');
+                    $('#send-status').removeClass().addClass('label label-info').html('sending...');
                 }
             })
             .done(function (data) {
-                $('#send-status').removeClass().addClass('label label-success').html('sent');
                 $('#rate').rating('refresh', {disabled: false});
+                $('.rating-container .caption').append('<span class="label" id="send-status"></span>');
+                $('#send-status').removeClass().addClass('label label-success').html('sent');
             })
             .fail(function () {
-                $('#send-status').removeClass().addClass('label label-warning').html('error');
                 $('#rate').rating('refresh', {disabled: false});
+                $('.rating-container .caption').append('<span class="label" id="send-status"></span>');
+                $('#send-status').removeClass().addClass('label label-warning').html('error');
                 alert("error: cannot submit the rating");
             });
     });
