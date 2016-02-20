@@ -18,6 +18,8 @@ class CreateRatingsTable extends Migration
             $table->integer('lesson_id')->nullable();
             $table->tinyInteger('rating')->nullable();
             $table->timestamps();
+            $table->softDeletes();
+            $table->unique('session_id', 'created_at');
         });
     }
 

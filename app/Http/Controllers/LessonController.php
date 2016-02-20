@@ -8,9 +8,7 @@ use App\Rating;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\URL;
-use Ramsey\Uuid\Uuid;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LessonController extends Controller
 {
@@ -64,19 +62,22 @@ class LessonController extends Controller
     public function show($id)
     {
         $lesson = Lesson::find($id);
+        $ratings = [];
         if (!$lesson) {
             return response('Leeson not found', 404);
         }
-        if($lesson->enabled){
+        if ($lesson->enabled) {
             $length = 90;   //minute
             $now = new Carbon();
-            if($lesson->updated_at->diffInMinutes($now) > $length){
+            if ($lesson->updated_at->diffInMinutes($now) > $length) {
                 $lesson->enabled = 0;
                 $lesson->save();
             }
+        } else {
+            $ratings = Rating::withTrashed() ->where('lesson_id', '=', $id)->get()->all();
         }
         return response()
-            ->view('lesson.show', ['lesson' => $lesson]);
+            ->view('lesson.show', ['lesson' => $lesson, 'ratings' => $ratings]);
     }
 
     public function all($id)
@@ -102,5 +103,20 @@ class LessonController extends Controller
             $lesson->enabled = true;
             $lesson->save();
         }
+    }
+
+    public function export($id)
+    {
+        $ratings = Rating
+            ::withTrashed()
+            ->where('lesson_id', '=', $id)
+            ->get();
+        //dd($ratings);
+
+        Excel::create('ratings', function ($excel) use ($ratings) {
+            $excel->sheet('Sheet 1', function ($sheet) use ($ratings) {
+                $sheet->fromArray($ratings);
+            });
+        })->export('xls');
     }
 }

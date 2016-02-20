@@ -5,7 +5,13 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="panel panel-default">
-                    <div class="panel-heading">{{$lesson->description}}</div>
+                    <div class="panel-heading clearfix">
+                        @if(!$lesson->enabled && Auth::check())
+                            <a href="/lesson/{{$lesson->id}}/export" class="btn btn-default pull-right"><span
+                                        class="glyphicon glyphicon-download-alt"></span> Export</a>
+                        @endif
+                        <h4 class="panel-title">{{$lesson->description}}</h4>
+                    </div>
                     <div class="panel-body">
                         <form class="form-horizontal" role="form" method="POST" action="{{ url('/rating') }}">
                             {!! csrf_field() !!}
@@ -13,27 +19,9 @@
                             @if($lesson->enabled && !Auth::check())
                                 <div class="form-group">
                                     <div class="col-md-8">
-                                        {{--<input type="range" min="0" max="4" name="rate" value="0" id="rate"--}}
-                                        {{--onchange="updateRange(this)">--}}
                                         <div>Rate your understanding (1=very poor, 5=very good)</div>
                                         <input id="rate" name="rate" type="number" class="rating" min=0 max=5 step=1>
                                     </div>
-                                    {{--<div class="col-md-2">--}}
-                                    {{--<select id="rate-value" onchange="updateRange(this)">--}}
-                                    {{--<option value="0">0</option>--}}
-                                    {{--<option value="1">1</option>--}}
-                                    {{--<option value="2">2</option>--}}
-                                    {{--<option value="3">3</option>--}}
-                                    {{--<option value="4">4</option>--}}
-                                    {{--</select>--}}
-                                    {{--</div>--}}
-
-                                    {{--<div class="col-md-2">--}}
-
-                                    {{--<button type="button" class="btn btn-primary" id="submit-rate">--}}
-                                    {{--Rate--}}
-                                    {{--</button>--}}
-                                    {{--</div>--}}
                                 </div>
                             @endif
                             <div class="form-group">
@@ -41,6 +29,42 @@
                                     <div id="chart"></div>
                                 </div>
                             </div>
+                            @if(!$lesson->enabled && Auth::check())
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div id="chart-individual"></div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div id="ratings">
+                                            <table class="table table-bordered table-responsive">
+                                                @foreach ($ratings as $rating)
+                                                    <tr>
+
+                                                        <td>{{$rating->created_at->timezone('Australia/Melbourne')}}</td>
+                                                        <td>{{$rating->session_id}}</td>
+                                                        <td>{{$rating->rating}}</td>
+                                                        <td>
+                                                            <button
+                                                                    class="btn {{$rating->deleted_at?"btn-primary":"btn-default"}} btn-sm enable-rating"
+                                                                    type="button"
+                                                                    data-id="{{ $rating->id }}"
+                                                                    data-enabled="{{$rating->deleted_at?0:1}}">
+                                                                {{!$rating->deleted_at?"Disable":"&nbsp;Enable"}}
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            @endif
                             @if (Auth::check() && $lesson->enabled)
                                 <div class="form-group">
                                     <div class="col-md-8 col-md-offset-2">

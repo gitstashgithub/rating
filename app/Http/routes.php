@@ -68,10 +68,19 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('lesson/{id}/enable/', [
         'uses' => 'LessonController@enable'
     ]);
+    Route::get('lesson/{id}/export/', [
+        'uses' => 'LessonController@export'
+    ]);
 
 
+    Route::get('rating/{id}/users', [
+        'uses' => 'RatingController@getUsersResults'
+    ]);
     Route::get('rating/{id}', [
         'uses' => 'RatingController@getResult'
+    ]);
+    Route::post('rating/{id}/toggleDelete', [
+        'uses' => 'RatingController@toggleDelete'
     ]);
     Route::post('rating', [
         'uses' => 'RatingController@setRate'

@@ -17,6 +17,63 @@ class RatingController extends Controller
             ->view('rate.result');
     }
 
+    public function getUsersResults(Request $request, $id)
+    {
+        $session_id = Session::getId();
+
+        if (!$session_id) {
+            return response('', 400);
+        }
+
+        $array = [];
+
+        $time = DB
+            ::table('ratings')
+            ->where('lesson_id', '=', $id)
+            ->whereNull('deleted_at')
+            ->select('created_at')
+            ->select(DB::raw('MAX(created_at) as finish, Min(created_at) as start'))->first();
+        //dd($time);
+        $start = strtotime($time->start);
+        $start = floor($start / 60) * 60;
+        $finish = strtotime($time->finish);
+        $finish = floor($finish / 60) * 60 + 60;
+
+        $results = DB
+            ::table('ratings')
+            ->where('lesson_id', '=', $id)
+            ->whereNull('deleted_at')
+            ->orderBy('created_at')
+            ->groupBy(DB::raw('HOUR(created_at), MINUTE(created_at),session_id'))
+            ->get();
+        //dd($results);
+
+        $sessionIds = collect($results)->pluck('session_id')->unique()->values()->flip()->all();
+        $return = [];
+        $return['xs'] = [];
+        $return['json'] = [];
+        foreach ($sessionIds as $id) {
+            $return['xs']['User' . ($id + 1)] = 'x' . ($id + 1);
+        }
+        $j = 0;
+        for ($i = $start; $i <= $finish; $i = $i + 60) {
+            $ratings = [];
+            foreach ($results as $result) {
+                $id = $sessionIds[$result->session_id] + 1;
+                $created_at = strtotime($result->created_at);
+                if ($created_at >= $i && $created_at < $i + 60) {
+                    $return['json']['User' . $id][] = $result->rating;
+                    $return['json']['x' . $id][] = $j;
+                }
+            }
+            $j++;
+        }
+
+        // foreach($ratings )
+
+        return json_encode($return);
+    }
+
 
     public function getResult(Request $request, $id)
     {
@@ -31,6 +88,7 @@ class RatingController extends Controller
         $time = DB
             ::table('ratings')
             ->where('lesson_id', '=', $id)
+            ->whereNull('deleted_at')
             ->select('created_at')
             ->select(DB::raw('MAX(created_at) as finish, Min(created_at) as start'))->first();
         //dd($time);
@@ -42,6 +100,7 @@ class RatingController extends Controller
         $results = DB
             ::table('ratings')
             ->where('lesson_id', '=', $id)
+            ->whereNull('deleted_at')
             ->orderBy('created_at')
             ->groupBy(DB::raw('HOUR(created_at), MINUTE(created_at),session_id'))
             ->get();
@@ -64,10 +123,10 @@ class RatingController extends Controller
             $j++;
         }
 
-        foreach($array as $item=>$value){
-            foreach($allSessions as $session_id){
-                if($item>0 && !array_key_exists($session_id, $value) && array_key_exists($session_id,$array[$item-1])){
-                    $array[$item][$session_id] = $array[$item-1][$session_id];
+        foreach ($array as $item => $value) {
+            foreach ($allSessions as $session_id) {
+                if ($item > 0 && !array_key_exists($session_id, $value) && array_key_exists($session_id, $array[$item - 1])) {
+                    $array[$item][$session_id] = $array[$item - 1][$session_id];
                 }
             }
         }
@@ -79,10 +138,11 @@ class RatingController extends Controller
         foreach ($array as $a) {
             sort($a);
             $count = count($a);
-            $middle = $count / 2;
+            $middle = ($count-1) / 2;
             //dd($a, $count,$middle);
             $return['median'][] = ($count % 2 == 0) ? (($a[floor($middle)] + $a[ceil($middle)]) / 2) : $a[$middle];
             $return['mean'][] = number_format(array_sum($a) / $count, 1);
+            //var_dump($a,$count,$middle,($count % 2 == 0) ? (($a[floor($middle)] + $a[ceil($middle)]) / 2) : $a[$middle]);
         }
         $returns = [];
         $returns['ratings'] = $return;
@@ -96,15 +156,16 @@ class RatingController extends Controller
             ->select(DB::raw('max(created_at) AS created_at,group_concat(bookmark) AS bookmark'))
             ->get();
         $return2 = [];
-        foreach($bookmarks as $bookmark){
+        foreach ($bookmarks as $bookmark) {
             $bookmarkTime = strtotime($bookmark->created_at);
             $bookmarkTime = floor($bookmarkTime / 60) * 60;
             $bm = [];
-            $bm['value'] = ($bookmarkTime-$start)/60;
+            $bm['value'] = ($bookmarkTime - $start) / 60;
             $bm['text'] = $bookmark->bookmark;
             $return2[] = $bm;
         }
         $returns['bookmarks'] = $return2;
+        //dd($returns);
         return json_encode($returns);
     }
 
@@ -153,5 +214,16 @@ class RatingController extends Controller
         $bookmark->save();
 
         return response('', 201);
+    }
+
+    public function toggleDelete($id)
+    {
+        /** @var Rating $rating */
+        $rating = Rating::withTrashed()->where('id','=',$id)->first();
+        if ($rating->trashed()) {
+            $rating->restore();
+        } else {
+            $rating->delete();
+        }
     }
 }
