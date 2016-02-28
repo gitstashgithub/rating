@@ -32,6 +32,12 @@ Route::get('/', function () {
 */
 
 Route::group(['middleware' => ['web']], function () {
+    Route::post('bookmark', [
+        'uses' => 'BookmarkController@store'
+    ]);
+    Route::put('bookmark/{id}', [
+        'uses' => 'BookmarkController@update'
+    ]);
 //    Route::get('lesson', [
 //        'as' => 'lesson',
 //        'uses' => 'LessonController@all'
@@ -79,15 +85,19 @@ Route::group(['middleware' => ['web']], function () {
     Route::get('rating/{id}', [
         'uses' => 'RatingController@getResult'
     ]);
+    Route::post('rating/{id}', [
+        'uses' => 'RatingController@getResult'
+    ]);
     Route::post('rating/{id}/toggleDelete', [
         'uses' => 'RatingController@toggleDelete'
+    ]);
+    Route::get('rating/{id}/rating-summary', [
+        'uses' => 'RatingController@ratingSummary'
     ]);
     Route::post('rating', [
         'uses' => 'RatingController@setRate'
     ]);
-    Route::post('bookmark', [
-        'uses' => 'RatingController@setBookmark'
-    ]);
+
 });
 
 Route::group(['middleware' => 'web'], function () {
@@ -110,4 +120,6 @@ Route::group(['middleware' => ['web', 'auth']], function () {
     Route::put('lecture', [
         'uses' => 'LectureController@update'
     ]);
+
+
 });

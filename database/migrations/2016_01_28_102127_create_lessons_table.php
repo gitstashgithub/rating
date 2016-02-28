@@ -18,6 +18,7 @@ class CreateLessonsTable extends Migration
             $table->date('lesson_date')->nullable();
             $table->time('lesson_time')->nullable();
             $table->integer('lecture_id')->index();
+            $table->text('message')->nullable();
             $table->boolean('enabled')->nullable();
             $table->timestamps();
         });

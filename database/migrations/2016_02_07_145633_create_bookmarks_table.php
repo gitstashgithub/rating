@@ -16,6 +16,7 @@ class CreateBookmarksTable extends Migration
             $table->increments('id');
             $table->integer('lesson_id')->index();
             $table->text('bookmark')->nullable();
+            $table->timestamp('bookmarked_at');
             $table->timestamps();
         });
     }

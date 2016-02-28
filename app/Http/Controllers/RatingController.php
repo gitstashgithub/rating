@@ -37,7 +37,7 @@ class RatingController extends Controller
         $start = strtotime($time->start);
         $start = floor($start / 60) * 60;
         $finish = strtotime($time->finish);
-        $finish = floor($finish / 60) * 60 + 60;
+        $finish = floor($finish / 60) * 60;
 
         $results = DB
             ::table('ratings')
@@ -95,11 +95,28 @@ class RatingController extends Controller
         $start = strtotime($time->start);
         $start = floor($start / 60) * 60;
         $finish = strtotime($time->finish);
-        $finish = floor($finish / 60) * 60 + 60;
+        $finish = floor($finish / 60) * 60;
+
+        $ignoreUsers = null;
+        if($request->ignoreRatings){
+            $ignoreUsers = DB
+                ::table('ratings')
+                ->where('lesson_id', '=', $id)
+                ->whereNull('deleted_at')
+                ->groupBy('session_id')
+                ->select(DB::raw('count(rating) as `total`,max(session_id) as session_id'))
+                ->havingRaw('`total` not in ('.implode(',',$request->ignoreRatings).')')
+                ->get();
+            $ignoreUsers = collect($ignoreUsers)->pluck('session_id')->all();
+        }
 
         $results = DB
             ::table('ratings')
-            ->where('lesson_id', '=', $id)
+            ->where('lesson_id', '=', $id);
+        if($request->ignoreRatings && $ignoreUsers) {
+            $results = $results->whereIn('session_id',$ignoreUsers);
+        }
+        $results = $results
             ->whereNull('deleted_at')
             ->orderBy('created_at')
             ->groupBy(DB::raw('HOUR(created_at), MINUTE(created_at),session_id'))
@@ -122,11 +139,20 @@ class RatingController extends Controller
             $array[] = $ratings;
             $j++;
         }
-
+        //dd($array);
+        $saved_array = $array;
+        $allSessions = array_unique($allSessions);
+        $last_value_item = [];
         foreach ($array as $item => $value) {
             foreach ($allSessions as $session_id) {
+                if(key_exists($session_id,$saved_array[$item])){
+                    $last_value_item[$session_id] = $item;
+                }
+
                 if ($item > 0 && !array_key_exists($session_id, $value) && array_key_exists($session_id, $array[$item - 1])) {
-                    $array[$item][$session_id] = $array[$item - 1][$session_id];
+                    if(!$request->ignoreMinutes>0 || ($item-$last_value_item[$session_id]<$request->ignoreMinutes)){
+                        $array[$item][$session_id] = $array[$item - 1][$session_id];
+                    }
                 }
             }
         }
@@ -136,13 +162,19 @@ class RatingController extends Controller
         $return['mean'] = [];
 
         foreach ($array as $a) {
-            sort($a);
-            $count = count($a);
-            $middle = ($count-1) / 2;
-            //dd($a, $count,$middle);
-            $return['median'][] = ($count % 2 == 0) ? (($a[floor($middle)] + $a[ceil($middle)]) / 2) : $a[$middle];
-            $return['mean'][] = number_format(array_sum($a) / $count, 1);
-            //var_dump($a,$count,$middle,($count % 2 == 0) ? (($a[floor($middle)] + $a[ceil($middle)]) / 2) : $a[$middle]);
+            if(count($a)>0){
+                sort($a);
+                $count = count($a);
+                $middle = ($count-1) / 2;
+                //var_dump($a, $count,$middle);
+                $return['median'][] = ($count % 2 == 0) ? (($a[floor($middle)] + $a[ceil($middle)]) / 2) : $a[$middle];
+                $return['mean'][] = number_format(array_sum($a) / $count, 1);
+                //var_dump($a,$count,$middle,($count % 2 == 0) ? (($a[floor($middle)] + $a[ceil($middle)]) / 2) : $a[$middle]);
+            }else{
+                $return['median'][] = '';
+                $return['mean'][] = '';
+            }
+
         }
         $returns = [];
         $returns['ratings'] = $return;
@@ -151,13 +183,13 @@ class RatingController extends Controller
         $bookmarks = DB
             ::table('bookmarks')
             ->where('lesson_id', '=', $id)
-            ->orderBy('created_at')
-            ->groupBy(DB::raw('HOUR(created_at), MINUTE(created_at)'))
-            ->select(DB::raw('max(created_at) AS created_at,group_concat(bookmark) AS bookmark'))
+            ->orderBy('bookmarked_at')
+            ->groupBy(DB::raw('HOUR(bookmarked_at), MINUTE(bookmarked_at)'))
+            ->select(DB::raw('max(bookmarked_at) AS bookmarked_at,group_concat(bookmark) AS bookmark'))
             ->get();
         $return2 = [];
         foreach ($bookmarks as $bookmark) {
-            $bookmarkTime = strtotime($bookmark->created_at);
+            $bookmarkTime = strtotime($bookmark->bookmarked_at);
             $bookmarkTime = floor($bookmarkTime / 60) * 60;
             $bm = [];
             $bm['value'] = ($bookmarkTime - $start) / 60;
@@ -225,5 +257,47 @@ class RatingController extends Controller
         } else {
             $rating->delete();
         }
+    }
+
+    public function ratingSummary($id){
+        $return = [];
+        $results = DB
+            ::table('ratings')
+            ->where('lesson_id', '=', $id)
+            ->whereNull('deleted_at')
+            ->groupBy('session_id')
+            ->select(DB::raw('count(*) as rating_count,max(rating)-min(rating) as `range`'))
+            ->get();
+        $return['user'] = [];
+        $return['user']['type'] = 'bar';
+        $return['user']['columns'] = [];
+
+        $return['range'] = [];
+        $return['range']['type'] = 'bar';
+        $return['range']['columns'] = [];
+        $i=1;
+        foreach($results as $result){
+            $return['user']['columns'][] = ['User'.$i,$result->rating_count];
+            $return['range']['columns'][] = ['User'.$i,$result->range];
+            $i++;
+        }
+
+        $results = DB
+            ::table('ratings')
+            ->where('lesson_id', '=', $id)
+            ->whereNull('deleted_at')
+            ->groupBy('rating')
+            ->select(DB::raw('count(*) as rating_total'))
+            ->get();
+        $return['total'] = [];
+        $return['total']['type'] = 'bar';
+        $return['total']['columns'] = [];
+        $i=1;
+        foreach($results as $result){
+            $return['total']['columns'][] = [$i . ' Star',$result->rating_total];
+            $i++;
+        }
+
+        return json_encode($return);
     }
 }

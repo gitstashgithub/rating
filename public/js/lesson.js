@@ -27,6 +27,17 @@ var colorPattern = [
     "#C895C5", "#320033", "#FF6832", "#66E1D3", "#CFCDAC", "#D0AC94", "#7ED379", "#012C58"
 ];
 $(document).ready(function () {
+    var lesson_id = $("#lesson_id").val();
+    var _token = $('input[name="_token"]').val();
+
+    if ($('#ignore-ratings').length) {
+        $('#ignore-ratings').multiselect();
+    }
+
+    if ($('#ignore-minutes').length) {
+        $('#ignore-minutes').multiselect();
+    }
+
     $("#rate").rating();
 
     $('#rate').on('rating.change', function (event, value, caption) {
@@ -34,9 +45,9 @@ $(document).ready(function () {
         $.ajax({
                 method: "POST",
                 url: "/rating",
-                data: {lesson_id: $('#lesson_id').val(), rating: value},
+                data: {lesson_id: lesson_id, rating: value},
                 headers: {
-                    'X-CSRF-Token': $('input[name="_token"]').val()
+                    'X-CSRF-Token': _token
                 },
                 beforeSend: function (xhr) {
                     $('#rate').rating('refresh', {disabled: true});
@@ -61,9 +72,9 @@ $(document).ready(function () {
         $.ajax({
                 method: "POST",
                 url: "/bookmark",
-                data: {lesson_id: $('#lesson_id').val(), bookmark: $('#bookmark').val()},
+                data: {lesson_id: lesson_id, bookmark: $('#bookmark').val()},
                 headers: {
-                    'X-CSRF-Token': $('input[name="_token"]').val()
+                    'X-CSRF-Token': _token
                 },
                 beforeSend: function (xhr) {
                     $('#submit-bookmark').html('Saving...');
@@ -83,7 +94,10 @@ $(document).ready(function () {
     var ajax_call = function () {
         $.ajax({
                 method: "GET",
-                url: "/rating/" + $("#lesson_id").val()
+                headers: {
+                    'X-CSRF-Token': _token
+                },
+                url: "/rating/" + lesson_id
             })
             .done(function (data) {
                 data = jQuery.parseJSON(data);
@@ -110,14 +124,24 @@ $(document).ready(function () {
                 max: 5,
                 min: 1
             },
-            x:{
-                min: -1
+            x: {
+                min: -1,
+                tick: {
+                    culling: {
+                        max: 1 // the number of tick texts will be adjusted to less than this value
+                    }
+                    // for normal axis, default on
+                    // for category axis, default off
+                }
             }
         }
     });
     $.ajax({
             method: "GET",
-            url: "/rating/" + $("#lesson_id").val()
+            headers: {
+                'X-CSRF-Token': _token
+            },
+            url: "/rating/" + lesson_id
         })
         .done(function (data) {
             data = jQuery.parseJSON(data);
@@ -140,14 +164,24 @@ $(document).ready(function () {
                     max: 5,
                     min: 1
                 },
-                x:{
-                    min: -1
+                x: {
+                    min: -1,
+                    tick: {
+                        culling: {
+                            max: 1 // the number of tick texts will be adjusted to less than this value
+                        }
+                        // for normal axis, default on
+                        // for category axis, default off
+                    }
                 }
             }
         });
         $.ajax({
                 method: "GET",
-                url: "/rating/" + $("#lesson_id").val() + "/users"
+                headers: {
+                    'X-CSRF-Token': _token
+                },
+                url: "/rating/" + lesson_id + "/users"
             })
             .done(function (data) {
                 data = jQuery.parseJSON(data);
@@ -160,24 +194,154 @@ $(document).ready(function () {
         var rating_id = $(_this).data('id');
         $.ajax({
                 method: "POST",
-                url: "/rating/"+rating_id+"/toggleDelete",
+                url: "/rating/" + rating_id + "/toggleDelete",
                 headers: {
-                    'X-CSRF-Token': $('input[name="_token"]').val()
+                    'X-CSRF-Token': _token
                 }
             })
             .done(function (data) {
-                if($(_this).data('enabled')){
+                if ($(_this).data('enabled')) {
                     $(_this).removeClass('btn-default').addClass('btn-primary').html('&nbsp;Enable');
 
-                    $(_this).data('enabled',0);
-                }else{
+                    $(_this).data('enabled', 0);
+                } else {
                     $(_this).removeClass('btn-primary').addClass('btn-default').html('Disable');
 
-                    $(_this).data('enabled',1);
+                    $(_this).data('enabled', 1);
                 }
             })
             .fail(function () {
                 alert("error: cannot enable/disable the rating");
+            });
+    });
+
+    $.fn.editable.defaults.mode = 'inline';
+    $.fn.editable.defaults.ajaxOptions = {type: "PUT"};
+    $('.bookmarked_at').editable({
+        ajaxOptions: {
+            type: 'put',
+            dataType: 'json',
+            headers: {
+
+                'X-CSRF-Token': _token
+            },
+        },
+        params: function (params) {
+            //originally params contain pk, name and value
+            params.id = params.pk;
+            params.bookmarked_at = params.value;
+            return params;
+        }
+    });
+    $('.bookmark').editable({
+        ajaxOptions: {
+
+            type: 'put',
+            dataType: 'json',
+            headers: {
+                'X-CSRF-Token': _token
+            },
+        },
+        params: function (params) {
+            //originally params contain pk, name and value
+            params.id = params.pk;
+            params.bookmark = params.value;
+            return params;
+        }
+    });
+
+    $('#save-new-bookmark').click(function () {
+        $.ajax({
+                method: "POST",
+                headers: {
+                    'X-CSRF-Token': _token
+                },
+                url: "/bookmark",
+                data: {
+                    lesson_id: lesson_id,
+                    bookmark: $('#new_bookmark').val(),
+                    bookmarked_at: $('#new_bookmarked_at').val()
+                },
+                headers: {
+                    'X-CSRF-Token': _token
+                }
+            })
+            .done(function (data) {
+                location.reload();
+            })
+            .fail(function () {
+                alert("error: cannot submit the bookmark");
+            });
+        location.reload();
+    });
+
+    var chartUserSummary = c3.generate({
+        bindto: '#chart-user-summary',
+        data: {
+            json: {}
+        },
+        axis: {
+            x: {
+                type: 'category',
+                categories: ['Number of ratings per user']
+            }
+        },
+        color: {pattern: colorPattern},
+    });
+    var chartRatingRange = c3.generate({
+        bindto: '#chart-rating-range',
+        data: {
+            json: {}
+        },
+        axis: {
+            x: {
+                type: 'category',
+                categories: ['Range of ratings per user']
+            }
+        },
+        color: {pattern: colorPattern},
+    });
+    var chartTotalRatings = c3.generate({
+        bindto: '#chart-total-ratings',
+        data: {
+            json: {}
+        },
+        axis: {
+            x: {
+                type: 'category',
+                categories: ['Number of ratings']
+            }
+        }
+    });
+    $.ajax({
+            method: "GET",
+            headers: {
+                'X-CSRF-Token': _token
+            },
+            url: "/rating/" + lesson_id + "/rating-summary"
+        })
+        .done(function (data) {
+            data = jQuery.parseJSON(data);
+            chartUserSummary.load(data.user);
+            chartRatingRange.load(data.range);
+            chartTotalRatings.load(data.total);
+        });
+
+    $('#update-rating-chart').click(function () {
+        $.ajax({
+                method: "POST",
+                data: {ignoreRatings: $('#ignore-ratings').val(), ignoreMinutes: $('#ignore-minutes').val()},
+                headers: {
+                    'X-CSRF-Token': _token
+                },
+                url: "/rating/" + lesson_id
+            })
+            .done(function (data) {
+                data = jQuery.parseJSON(data);
+                chart.load({
+                    json: data.ratings
+                });
+                //chart.xgrids(data.bookmarks);
             });
     });
 });

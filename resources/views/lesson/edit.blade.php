@@ -56,6 +56,20 @@
                             </div>
                         </div>
 
+                        <div class="form-group{{ $errors->has('lesson_date') ? ' has-error' : '' }}">
+                            <label class="col-md-4 control-label">Message</label>
+
+                            <div class="col-md-6">
+                                <textarea rows="5" type="text" class="form-control"
+                                          name="message">{{ $lesson->message }}</textarea>
+                                @if ($errors->has('message'))
+                                    <span class="help-block">
+                                        <strong>{{ $errors->first('message') }}</strong>
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+
 
                         <div class="form-group">
                             <div class="col-md-6 col-md-offset-4">

@@ -21,4 +21,9 @@ class Lesson extends Model
     {
         return $this->belongsTo(Lecture::class);
     }
+
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class);
+    }
 }

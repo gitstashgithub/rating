@@ -15,8 +15,11 @@ class LessonRatingSeeder extends Seeder
                 ->create(['lecture_id' => $lecture->id])
                 ->each(function (Lesson $lesson) {
                     for ($i = 0; $i < 5; $i++) {
-                        factory(Rating::class, 5)->create(['session_id' => $i, 'lesson_id' => $lesson->id]);
-                        factory(Bookmark::class, 5)->create(['lesson_id' => $lesson->id]);
+                        factory(Rating::class, rand(3,10))->create(['session_id' => $i, 'lesson_id' => $lesson->id]);
+                        factory(Bookmark::class, 5)->create(['lesson_id' => $lesson->id])->each(function(Bookmark $bookmark){
+                            $bookmark->bookmarked_at = $bookmark->created_at;
+                            $bookmark->save();
+                        });
                     }
                 });
         });

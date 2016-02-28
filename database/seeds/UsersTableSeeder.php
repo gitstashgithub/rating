@@ -15,6 +15,7 @@ class UsersTableSeeder extends Seeder
             'name' => "Meng",
             'email' => 'pseudobulbar@gmail.com',
             'password' => bcrypt('meng'),
+            'timezone' => 'Australia/Melbourne',
         ]);
     }
 }

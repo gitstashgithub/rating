@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Bookmark;
 use App\Lecture;
 use App\Lesson;
 use App\Rating;
@@ -41,6 +42,7 @@ class LessonController extends Controller
         $lesson->description = $request->get('description');
         $lesson->lesson_date = $request->get('lesson_date');
         $lesson->lesson_time = $request->get('lesson_time');
+        $lesson->message = $request->get('message');
         $lesson->enabled = 0;
         $lesson->save();
         return redirect('lecture/' . $lesson->lecture_id . '/lesson/');
@@ -55,6 +57,7 @@ class LessonController extends Controller
         $lesson->description = $request->get('description');
         $lesson->lesson_date = $request->get('lesson_date');
         $lesson->lesson_time = $request->get('lesson_time');
+        $lesson->message = $request->get('message');
         $lesson->save();
         return redirect('lecture/' . $lesson->lecture_id . '/lesson/');
     }
@@ -76,8 +79,12 @@ class LessonController extends Controller
         } else {
             $ratings = Rating::withTrashed() ->where('lesson_id', '=', $id)->get()->all();
         }
+        $bookmarks = $lesson->bookmarks->sortBy('bookmarked_at');
+        foreach($bookmarks as $bookmark){
+            $bookmark->bookmarked_at = new Carbon($bookmark->bookmarked_at);
+        }
         return response()
-            ->view('lesson.show', ['lesson' => $lesson, 'ratings' => $ratings]);
+            ->view('lesson.show', ['lesson' => $lesson, 'ratings' => $ratings, 'bookmarks' => $bookmarks]);
     }
 
     public function all($id)
