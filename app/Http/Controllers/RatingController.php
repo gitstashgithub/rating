@@ -287,15 +287,13 @@ class RatingController extends Controller
             ->where('lesson_id', '=', $id)
             ->whereNull('deleted_at')
             ->groupBy('rating')
-            ->select(DB::raw('count(*) as rating_total'))
+            ->select(DB::raw('count(*) as rating_total,max(rating) as rating'))
             ->get();
         $return['total'] = [];
         $return['total']['type'] = 'bar';
         $return['total']['columns'] = [];
-        $i=1;
         foreach($results as $result){
-            $return['total']['columns'][] = [$i . ' Star',$result->rating_total];
-            $i++;
+            $return['total']['columns'][] = [$result->rating . ' Star',$result->rating_total];
         }
 
         return json_encode($return);
