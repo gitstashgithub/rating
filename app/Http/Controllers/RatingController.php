@@ -267,6 +267,7 @@ class RatingController extends Controller
             ->whereNull('deleted_at')
             ->groupBy('session_id')
             ->select(DB::raw('count(*) as rating_count,max(rating)-min(rating) as `range`'))
+            ->orderby('created_at')
             ->get();
         $return['user'] = [];
         $return['user']['type'] = 'bar';
