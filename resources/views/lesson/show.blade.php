@@ -81,8 +81,8 @@
                                         <div id="chart-total-ratings"></div>
                                     </div>
                                 </div>
-
-
+                            @endif
+                            @if(!$lesson->enabled && Auth::check())
                                 <div class="form-group">
                                     <div class="col-md-12">
                                         <div>
