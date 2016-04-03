@@ -30,6 +30,29 @@ $(document).ready(function () {
     var lesson_id = $("#lesson_id").val();
     var _token = $('input[name="_token"]').val();
 
+    var zoom = $('#setting-zoom').val();
+
+    if($('#ignore-minutes').length){
+        $('#ignore-minutes').val($('#setting-exclude-rating').val());
+    }
+
+    if ($('.slider').length) {
+        $('#lesson-form').scale(zoom / 100);
+
+        $(".slider").slider({
+            min: 10,
+            max: 100,
+            step: 5,
+            value: zoom,
+            change: function (event, ui) {
+                $('#lesson-form').scale(ui.value / 100);
+            }
+        }).slider("pips", {
+            rest: "label",
+            suffix: '%'
+        }).slider('float');
+    }
+
     if ($('#ignore-ratings').length) {
         $('#ignore-ratings').multiselect();
     }
@@ -136,12 +159,22 @@ $(document).ready(function () {
             }
         }
     });
+    //
+    // var data = {};
+    // if($('#ignore-ratings').length){
+    //     data.ignoreRatings = $('#ignore-ratings');
+    // }
+    // if($('#ignore-minutes').length){
+    //     data.ignoreRatings = $('#ignore-minutes');
+    // }
+
     $.ajax({
             method: "GET",
             headers: {
                 'X-CSRF-Token': _token
             },
-            url: "/rating/" + lesson_id
+            url: "/rating/" + lesson_id,
+            data: {ignoreRatings: $('#ignore-ratings').val(), ignoreMinutes: $('#ignore-minutes').val()},
         })
         .done(function (data) {
             data = jQuery.parseJSON(data);
@@ -288,6 +321,19 @@ $(document).ready(function () {
         },
         color: {pattern: colorPattern},
     });
+    var chartUserSummaryFrequency = c3.generate({
+        bindto: '#chart-user-summary-frequency',
+        data: {
+            json: {}
+        },
+        axis: {
+            x: {
+                type: 'category',
+                categories: ['Frequency of Rating Numbers']
+            }
+        },
+        color: {pattern: colorPattern},
+    });
     var chartRatingRange = c3.generate({
         bindto: '#chart-rating-range',
         data: {
@@ -297,6 +343,19 @@ $(document).ready(function () {
             x: {
                 type: 'category',
                 categories: ['Range of ratings per user']
+            }
+        },
+        color: {pattern: colorPattern},
+    });
+    var chartRatingRangeFrequency = c3.generate({
+        bindto: '#chart-rating-range-frequency',
+        data: {
+            json: {}
+        },
+        axis: {
+            x: {
+                type: 'category',
+                categories: ['Frequency of Rating Ranges']
             }
         },
         color: {pattern: colorPattern},
@@ -324,6 +383,8 @@ $(document).ready(function () {
             data = jQuery.parseJSON(data);
             chartUserSummary.load(data.user);
             chartRatingRange.load(data.range);
+            chartUserSummaryFrequency.load(data.userFrequency);
+            chartRatingRangeFrequency.load(data.rangeFrequency);
             chartTotalRatings.load(data.total);
         });
 

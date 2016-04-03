@@ -6,6 +6,7 @@ use App\Bookmark;
 use App\Lecture;
 use App\Lesson;
 use App\Rating;
+use App\Setting;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -83,8 +84,9 @@ class LessonController extends Controller
         foreach($bookmarks as $bookmark){
             $bookmark->bookmarked_at = new Carbon($bookmark->bookmarked_at);
         }
+        $settings = Setting::all();
         return response()
-            ->view('lesson.show', ['lesson' => $lesson, 'ratings' => $ratings, 'bookmarks' => $bookmarks]);
+            ->view('lesson.show', ['lesson' => $lesson, 'ratings' => $ratings, 'bookmarks' => $bookmarks, 'settings'=>$settings]);
     }
 
     public function all($id)

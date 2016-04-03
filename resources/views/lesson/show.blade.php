@@ -17,10 +17,15 @@
                             {!! nl2br($lesson->message) !!}
                             <hr>
                         </div>
-                        <form class="form-horizontal" role="form" method="POST" action="{{ url('/rating') }}">
+                        <form id="lesson-form" class="form-horizontal" role="form" method="POST" action="{{ url('/rating') }}">
                             {!! csrf_field() !!}
                             <input type="hidden" name="lesson_id" id="lesson_id" value="{{$lesson->id}}"/>
+                            @foreach($settings as $setting)
+                                <input type="hidden" id="setting-{{$setting->name}}" value="{{$setting->value}}"/>
+                            @endforeach
+
                             @if($lesson->enabled && !Auth::check())
+                                <label class="col-md-1" for="">Zoom: </label><div class="slider col-md-10"></div>
                                 <div class="form-group">
                                     <div class="col-md-8">
                                         <div>Rate your understanding (1=very poor, 5=very good)</div>
@@ -77,7 +82,9 @@
                                     <div class="col-md-12">
                                         <div id="chart-individual"></div>
                                         <div id="chart-user-summary"></div>
+                                        <div id="chart-user-summary-frequency"></div>
                                         <div id="chart-rating-range"></div>
+                                        <div id="chart-rating-range-frequency"></div>
                                         <div id="chart-total-ratings"></div>
                                     </div>
                                 </div>
@@ -163,15 +170,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.14/d3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 
     {!! HTML::script('js/star-rating.min.js') !!}
     {!! HTML::script('js/bootstrap-multiselect.js') !!}
+    {!! HTML::script('js/scale.js') !!}
+    {!! HTML::script('js/jquery-ui-slider-pips.js') !!}
     {!! HTML::script('js/lesson.js') !!}
 @endsection
 @section('stylesheet')
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.css" rel='stylesheet' type='text/css'>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.css" rel='stylesheet' type='text/css'>
     <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
     {!! HTML::style('css/star-rating.min.css')  !!}
     {!! HTML::style('css/bootstrap-multiselect.css')  !!}
+    {!! HTML::style('css/jquery-ui-slider-pips.css')  !!}
     {!! HTML::style('css/lesson.css')  !!}
 @endsection

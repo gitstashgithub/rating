@@ -121,5 +121,13 @@ Route::group(['middleware' => ['web', 'auth']], function () {
         'uses' => 'LectureController@update'
     ]);
 
+    Route::get('settings', [
+        'as' => 'settings.all',
+        'uses' => 'SettingController@all'
+    ]);
+    Route::post('settings', [
+        'as' => 'settings.store',
+        'uses' => 'SettingController@store'
+    ]);
 
 });

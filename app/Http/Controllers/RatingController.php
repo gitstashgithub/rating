@@ -98,14 +98,14 @@ class RatingController extends Controller
         $finish = floor($finish / 60) * 60;
 
         $ignoreUsers = null;
-        if($request->ignoreRatings){
+        if ($request->ignoreRatings) {
             $ignoreUsers = DB
                 ::table('ratings')
                 ->where('lesson_id', '=', $id)
                 ->whereNull('deleted_at')
                 ->groupBy('session_id')
                 ->select(DB::raw('count(rating) as `total`,max(session_id) as session_id'))
-                ->havingRaw('`total` not in ('.implode(',',$request->ignoreRatings).')')
+                ->havingRaw('`total` not in (' . implode(',', $request->ignoreRatings) . ')')
                 ->get();
             $ignoreUsers = collect($ignoreUsers)->pluck('session_id')->all();
         }
@@ -113,8 +113,8 @@ class RatingController extends Controller
         $results = DB
             ::table('ratings')
             ->where('lesson_id', '=', $id);
-        if($request->ignoreRatings && $ignoreUsers) {
-            $results = $results->whereIn('session_id',$ignoreUsers);
+        if ($request->ignoreRatings && $ignoreUsers) {
+            $results = $results->whereIn('session_id', $ignoreUsers);
         }
         $results = $results
             ->whereNull('deleted_at')
@@ -145,12 +145,14 @@ class RatingController extends Controller
         $last_value_item = [];
         foreach ($array as $item => $value) {
             foreach ($allSessions as $session_id) {
-                if(key_exists($session_id,$saved_array[$item])){
+                if (key_exists($session_id, $saved_array[$item])) {
                     $last_value_item[$session_id] = $item;
                 }
 
-                if ($item > 0 && !array_key_exists($session_id, $value) && array_key_exists($session_id, $array[$item - 1])) {
-                    if(!$request->ignoreMinutes>0 || ($item-$last_value_item[$session_id]<$request->ignoreMinutes)){
+                if ($item > 0 && !array_key_exists($session_id, $value) && array_key_exists($session_id,
+                        $array[$item - 1])
+                ) {
+                    if (!$request->ignoreMinutes > 0 || ($item - $last_value_item[$session_id] < $request->ignoreMinutes)) {
                         $array[$item][$session_id] = $array[$item - 1][$session_id];
                     }
                 }
@@ -162,15 +164,15 @@ class RatingController extends Controller
         $return['mean'] = [];
 
         foreach ($array as $a) {
-            if(count($a)>0){
+            if (count($a) > 0) {
                 sort($a);
                 $count = count($a);
-                $middle = ($count-1) / 2;
+                $middle = ($count - 1) / 2;
                 //var_dump($a, $count,$middle);
                 $return['median'][] = ($count % 2 == 0) ? (($a[floor($middle)] + $a[ceil($middle)]) / 2) : $a[$middle];
                 $return['mean'][] = number_format(array_sum($a) / $count, 1);
                 //var_dump($a,$count,$middle,($count % 2 == 0) ? (($a[floor($middle)] + $a[ceil($middle)]) / 2) : $a[$middle]);
-            }else{
+            } else {
                 $return['median'][] = '';
                 $return['mean'][] = '';
             }
@@ -251,7 +253,7 @@ class RatingController extends Controller
     public function toggleDelete($id)
     {
         /** @var Rating $rating */
-        $rating = Rating::withTrashed()->where('id','=',$id)->first();
+        $rating = Rating::withTrashed()->where('id', '=', $id)->first();
         if ($rating->trashed()) {
             $rating->restore();
         } else {
@@ -259,7 +261,8 @@ class RatingController extends Controller
         }
     }
 
-    public function ratingSummary($id){
+    public function ratingSummary($id)
+    {
         $return = [];
         $results = DB
             ::table('ratings')
@@ -276,11 +279,42 @@ class RatingController extends Controller
         $return['range'] = [];
         $return['range']['type'] = 'bar';
         $return['range']['columns'] = [];
-        $i=1;
-        foreach($results as $result){
-            $return['user']['columns'][] = ['User'.$i,$result->rating_count];
-            $return['range']['columns'][] = ['User'.$i,$result->range];
+
+        $return['userFrequency'] = [];
+        $return['userFrequency']['type'] = 'bar';
+        $return['userFrequency']['columns'] = [];
+
+        $return['rangeFrequency'] = [];
+        $return['rangeFrequency']['type'] = 'bar';
+        $return['rangeFrequency']['columns'] = [];
+
+        $i = 1;
+        $rangeFrequency = [];
+        $userFrequency = [];
+        foreach ($results as $result) {
+            $return['user']['columns'][] = ['User' . $i, $result->rating_count];
+            if (!array_key_exists($result->rating_count . '-time', $userFrequency)) {
+                $userFrequency[$result->rating_count . '-time'] = 1;
+            } else {
+                $userFrequency[$result->rating_count . '-time']++;
+            }
+            $return['range']['columns'][] = ['User' . $i, $result->range];
+            if (!array_key_exists('range ' . $result->range, $rangeFrequency)) {
+                $rangeFrequency['range ' . $result->range] = 1;
+            } else {
+                $rangeFrequency['range ' . $result->range]++;
+            }
             $i++;
+        }
+        ksort($userFrequency);
+        ksort($rangeFrequency);
+
+        foreach ($userFrequency as $key => $value) {
+            $return['userFrequency']['columns'][] = [$key, $value];
+        }
+
+        foreach ($rangeFrequency as $key => $value) {
+            $return['rangeFrequency']['columns'][] = [$key, $value];
         }
 
         $results = DB
@@ -293,8 +327,8 @@ class RatingController extends Controller
         $return['total'] = [];
         $return['total']['type'] = 'bar';
         $return['total']['columns'] = [];
-        foreach($results as $result){
-            $return['total']['columns'][] = [$result->rating . ' Star',$result->rating_total];
+        foreach ($results as $result) {
+            $return['total']['columns'][] = [$result->rating . ' Star', $result->rating_total];
         }
 
         return json_encode($return);

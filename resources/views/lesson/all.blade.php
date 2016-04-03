@@ -40,7 +40,7 @@
                                             <a href="{{URL::route('lesson.create', ['lectureId' => $lecture->id])}}"
                                                class="btn btn-default">Add New Lesson</a>
                                         @endif
-                                        <a href="https://www.surveymonkey.com/r/SKLXKBB" class="btn btn-info">Survey</a>
+                                        <a href="https://www.surveymonkey.com/r/XZC99QK" class="btn btn-info">Survey</a>
                                     </div>
                                 </div>
                             </div>
